@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import Wardrobe from "./pages/Wardrobe";
@@ -9,6 +9,14 @@ import Brands from "./pages/Brands";
 import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+
+function ProtectedRoute({ children }: { children: JSX.Element }) {
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+        return <Navigate to="/login" replace />;
+    }
+    return children;
+}
 
 function AppRoutes() {
     const location = useLocation();
@@ -22,7 +30,14 @@ function AppRoutes() {
         </Routes>
     ) : (
         <Routes>
-            <Route path="/" element={<Layout />}>
+            <Route
+                path="/"
+                element={
+                    <ProtectedRoute>
+                        <Layout />
+                    </ProtectedRoute>
+                }
+            >
                 <Route index element={<Home />} />
                 <Route path="wardrobe" element={<Wardrobe />} />
                 <Route path="ai-suggestions" element={<AISuggestions />} />

@@ -20,12 +20,13 @@ export default function Login() {
         e.preventDefault();
         try {
             const res = await login(form);
-            const token = res.data?.accessToken || res.data?.token;
+            const accessToken = res.data?.accessToken || res.data?.accessToken;
+            const refreshToken = res.data?.refreshToken || res.data?.refreshToken;
 
-            if (token) {
-                localStorage.setItem("token", token);
-                alert("Login successful!");
-                navigate("/"); // ✅ редирект на главную
+            if (accessToken && refreshToken) {
+                localStorage.setItem("accessToken", accessToken);
+                localStorage.setItem("refreshToken", refreshToken);
+                navigate("/");
             } else {
                 alert("Login failed: No token received");
             }
