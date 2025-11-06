@@ -104,14 +104,18 @@ export default function Profile() {
 
                     if (photoResponse.ok) {
                         const blob = await photoResponse.blob();
-                        const imageUrl = URL.createObjectURL(blob);
-                        setProfilePhoto(imageUrl);
+                        if (blob.size > 0) {
+                            const imageUrl = URL.createObjectURL(blob);
+                            setProfilePhoto(imageUrl);
+                        } else {
+                            setProfilePhoto('resources/avatar-placeholder.png');
+                        }
                     } else {
-                        setProfilePhoto('https://via.placeholder.com/150?text=Avatar');
+                        setProfilePhoto('resources/avatar-placeholder.png');
                     }
                 } catch (photoErr) {
                     console.error('Failed to load profile photo:', photoErr);
-                    setProfilePhoto('https://via.placeholder.com/150?text=Avatar');
+                    setProfilePhoto('resources/avatar-placeholder.png');
                 }
             } catch (err) {
                 console.error(err);
@@ -301,7 +305,7 @@ export default function Profile() {
                                                     setEditedFirstname(profile.firstname);
                                                     setEditedLastname(profile.lastname);
                                                     setEditedEmail(profile.email);
-                                                    setProfilePhoto(profile.photoUrl || 'https://via.placeholder.com/150?text=Avatar');
+                                                    setProfilePhoto(profile.photoUrl || 'resources/avatar-placeholder.png');
                                                 }
                                             }}
                                             className="px-6 py-2 bg-gray-200 text-gray-700 rounded-full font-medium hover:bg-gray-300 transition-colors"

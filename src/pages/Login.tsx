@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, ChangeEvent, FormEvent } from "react";
 import { login } from "../api/auth";
+import {jwtDecode} from "jwt-decode";
 
 interface LoginForm {
     email: string;
@@ -26,6 +27,7 @@ export default function Login() {
             if (accessToken && refreshToken) {
                 localStorage.setItem("accessToken", accessToken);
                 localStorage.setItem("refreshToken", refreshToken);
+                localStorage.setItem("keycloakId", String(jwtDecode(accessToken).sub));
                 navigate("/");
             } else {
                 alert("Login failed: No token received");
@@ -61,7 +63,6 @@ export default function Login() {
                             onChange={handleChange}
                             type="email"
                             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            placeholder="you@example.com"
                             required
                         />
                     </div>
@@ -74,7 +75,6 @@ export default function Login() {
                             onChange={handleChange}
                             type="password"
                             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            placeholder="••••••••"
                             required
                         />
                     </div>
