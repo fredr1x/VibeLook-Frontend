@@ -22,9 +22,9 @@ interface LoginResponse {
 }
 
 export const register = async (data: RegisterData): Promise<AxiosResponse> => {
-    return axios.post(`${API_URL}/register`, data);
+    return axios.post(`${API_URL}/api/authregister`, data);
 };
 
 export const login = async (data: LoginData): Promise<AxiosResponse<LoginResponse>> => {
-    return axios.post(`${API_URL}/login`, data);
+    return axios.post(`${API_URL}/api/auth/login`, data);
 };

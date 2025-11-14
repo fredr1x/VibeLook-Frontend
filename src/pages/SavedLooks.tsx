@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Edit2, Heart, X } from 'lucide-react';
 
+const API_URL = import.meta.env.VITE_API_URL;
 type SavedOutfit = {
     id: string;
     name: string;
@@ -39,13 +40,13 @@ export default function SavedLooks() {
 
         const fetchSavedLooks = async () => {
             try {
-                const resLooks = await fetch(`http://localhost:80/api/looks/saved-looks/${keycloakId}`, {
+                const resLooks = await fetch(`${API_URL}/api/looks/saved-looks/${keycloakId}`, {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 });
                 if (!resLooks.ok) throw new Error('Failed to fetch saved looks');
                 const looksData = await resLooks.json();
 
-                const resPhotos = await fetch(`http://localhost:80/api/clothes/photos/${keycloakId}`, {
+                const resPhotos = await fetch(`${API_URL}/api/clothes/photos/${keycloakId}`, {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 });
                 if (!resPhotos.ok) throw new Error('Failed to fetch clothes images');

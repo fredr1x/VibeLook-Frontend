@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { User, Mail, Heart, Shirt } from 'lucide-react';
 import {jwtDecode} from 'jwt-decode';
 
+const API_URL = import.meta.env.VITE_API_URL;
 interface UserPreferences {
     colorPreferences: string[];
     stylePreferences: string[];
@@ -78,7 +79,7 @@ export default function Profile() {
 
             try {
                 // --- 1. Загружаем профиль ---
-                const response = await fetch(`http://localhost:80/api/profile/${userId}`, {
+                const response = await fetch(`${API_URL}/api/profile/${userId}`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
@@ -96,7 +97,7 @@ export default function Profile() {
                 // --- 2. Загружаем фото профиля как BLOB ---
                 try {
                     const photoResponse = await fetch(
-                        `http://localhost:80/api/files/get-profile/${data.keycloakId}`,
+                        `${API_URL}/api/files/get-profile/${data.keycloakId}`,
                         {
                             headers: { Authorization: `Bearer ${token}` },
                         }
@@ -133,7 +134,7 @@ export default function Profile() {
         const token = localStorage.getItem('accessToken');
 
         try {
-            const response = await fetch(`http://localhost:80/api/profile/update`, {
+            const response = await fetch(`${API_URL}/api/profile/update`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -185,7 +186,7 @@ export default function Profile() {
         formData.append('file', selectedFile);
 
         try {
-            const response = await fetch(`http://localhost:80/api/files/profile/${userId}`, {
+            const response = await fetch(`${API_URL}/api/files/profile/${userId}`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` },
                 body: formData,

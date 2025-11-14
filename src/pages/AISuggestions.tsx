@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, Sparkles, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+const API_URL = import.meta.env.VITE_API_URL;
 type Outfit = {
     id: string;
     name: string;
@@ -40,13 +41,13 @@ export default function AISuggestions() {
 
         const fetchOutfits = async () => {
             try {
-                const resLooks = await fetch(`http://localhost:80/api/looks/ai-suggestion/${keycloakId}`, {
+                const resLooks = await fetch(`${API_URL}/api/looks/ai-suggestion/${keycloakId}`, {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 });
                 if (!resLooks.ok) throw new Error('Failed to fetch AI suggestions');
                 const looksData = await resLooks.json();
 
-                const resPhotos = await fetch(`http://localhost:80/api/clothes/photos/${keycloakId}`, {
+                const resPhotos = await fetch(`${API_URL}/api/clothes/photos/${keycloakId}`, {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 });
                 if (!resPhotos.ok) throw new Error('Failed to fetch clothes images');
@@ -89,7 +90,7 @@ export default function AISuggestions() {
         setOutfits(updatedOutfits);
 
         try {
-            const res = await fetch(`http://localhost:80/api/looks/save-look/${id}`, {
+            const res = await fetch(`${API_URL}/api/looks/save-look/${id}`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${accessToken}` },
             });

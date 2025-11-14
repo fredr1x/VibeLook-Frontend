@@ -4,6 +4,7 @@ import { Upload, Sparkles, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL;
 type ClothingItem = {
     id: string;
     image: string;
@@ -119,7 +120,7 @@ export default function Wardrobe() {
     const accessToken = localStorage.getItem('accessToken');
 
     const api = axios.create({
-        baseURL: 'http://localhost:80/api',
+        baseURL: `${API_URL}/api`,
         headers: { Authorization: `Bearer ${accessToken}` },
     });
 
