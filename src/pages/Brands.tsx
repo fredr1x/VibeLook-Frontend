@@ -8,6 +8,7 @@ type Brand = {
   description: string;
   rating: number;
   category: string;
+  url: string;
 };
 
 export default function Brands() {
@@ -15,75 +16,57 @@ export default function Brands() {
     {
       id: '1',
       name: 'Zara',
-      logo: 'https://images.pexels.com/photos/1884581/pexels-photo-1884581.jpeg?auto=compress&cs=tinysrgb&w=400',
+      logo: '/resources/brands/zara.png',
       description: 'Contemporary fashion with European flair',
       rating: 4.5,
       category: 'Fast Fashion',
+      url: 'https://www.zara.com/kz/en/'
     },
     {
       id: '2',
-      name: 'H&M',
-      logo: 'https://images.pexels.com/photos/1884583/pexels-photo-1884583.jpeg?auto=compress&cs=tinysrgb&w=400',
-      description: 'Affordable and sustainable fashion choices',
-      rating: 4.3,
-      category: 'Fast Fashion',
-    },
-    {
-      id: '3',
       name: 'Nike',
-      logo: 'https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg?auto=compress&cs=tinysrgb&w=400',
+      logo: '/resources/brands/nike.png',
       description: 'Athletic wear and streetwear essentials',
       rating: 4.8,
       category: 'Sportswear',
+      url: 'https://www.nike.com/'
     },
     {
-      id: '4',
+      id: '3',
       name: 'Uniqlo',
-      logo: 'https://images.pexels.com/photos/1884584/pexels-photo-1884584.jpeg?auto=compress&cs=tinysrgb&w=400',
+      logo: '/resources/brands/uniqlo.png',
       description: 'Quality basics and innovative fabrics',
       rating: 4.6,
       category: 'Basics',
+      url: 'https://www.uniqlo.com/us/en/'
     },
     {
-      id: '5',
+      id: '4',
       name: 'Adidas',
-      logo: 'https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg?auto=compress&cs=tinysrgb&w=400',
+      logo: '/resources/brands/adidas.png',
       description: 'Sporty classics and modern streetwear',
       rating: 4.7,
       category: 'Sportswear',
+      url: 'https://adidas.kz/ru'
     },
     {
-      id: '6',
-      name: 'Gap',
-      logo: 'https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg?auto=compress&cs=tinysrgb&w=400',
+      id: '5',
+      name: 'Patagonia',
+      logo: '/resources/brands/patagonia.png',
       description: 'American casual wear for everyone',
       rating: 4.2,
       category: 'Casual',
+      url: 'https://www.patagonia.com/home/'
     },
     {
-      id: '7',
+      id: '6',
       name: 'Levi\'s',
-      logo: 'https://images.pexels.com/photos/1598507/pexels-photo-1598507.jpeg?auto=compress&cs=tinysrgb&w=400',
+      logo: '/resources/brands/levis.png',
       description: 'Iconic denim and timeless styles',
       rating: 4.7,
       category: 'Denim',
-    },
-    {
-      id: '8',
-      name: 'Mango',
-      logo: 'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=400',
-      description: 'Mediterranean-inspired fashion',
-      rating: 4.4,
-      category: 'Contemporary',
-    },
-    {
-      id: '9',
-      name: 'COS',
-      logo: 'https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=400',
-      description: 'Minimalist design and modern style',
-      rating: 4.5,
-      category: 'Premium',
-    },
+      url: 'https://www.levi.com/US/en_US/'
+    }
   ];
 
   return (
@@ -142,7 +125,9 @@ export default function Brands() {
                 </p>
 
                 <a
-                  href="#"
+                  href={brand.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center justify-center w-full px-4 py-2 bg-purple-600 text-white rounded-full font-medium hover:bg-purple-700 transition-colors"
                 >
                   Shop Now

@@ -1,170 +1,252 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Heart, ShoppingBag, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Heart, Sparkles, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 type Outfit = {
-  id: string;
-  name: string;
-  items: string[];
-  occasion: string;
-  saved: boolean;
+    id: string;
+    name: string;
+    items: string[]; // base64 image URLs
+    saved: boolean;
+    saving?: boolean;
+    suggestedDate: string;
+    lookItems?: {
+        clothesDto: {
+            id: number;
+            itemName: string;
+            category: string;
+        };
+    }[];
 };
 
 export default function AISuggestions() {
-  const navigate = useNavigate();
-  const [outfits, setOutfits] = useState<Outfit[]>([
-    {
-      id: '1',
-      name: 'Casual Weekend',
-      items: [
-        'https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'https://images.pexels.com/photos/1598507/pexels-photo-1598507.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg?auto=compress&cs=tinysrgb&w=400',
-      ],
-      occasion: 'Casual',
-      saved: false,
-    },
-    {
-      id: '2',
-      name: 'Business Professional',
-      items: [
-        'https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'https://images.pexels.com/photos/1598507/pexels-photo-1598507.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&cs=tinysrgb&w=400',
-      ],
-      occasion: 'Business',
-      saved: false,
-    },
-    {
-      id: '3',
-      name: 'Date Night Chic',
-      items: [
-        'https://images.pexels.com/photos/1183266/pexels-photo-1183266.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'https://images.pexels.com/photos/1598507/pexels-photo-1598507.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'https://images.pexels.com/photos/1078958/pexels-photo-1078958.jpeg?auto=compress&cs=tinysrgb&w=400',
-      ],
-      occasion: 'Evening',
-      saved: false,
-    },
-    {
-      id: '4',
-      name: 'Summer Vibes',
-      items: [
-        'https://images.pexels.com/photos/1040945/pexels-photo-1040945.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'https://images.pexels.com/photos/1598507/pexels-photo-1598507.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg?auto=compress&cs=tinysrgb&w=400',
-      ],
-      occasion: 'Casual',
-      saved: false,
-    },
-  ]);
+    const navigate = useNavigate();
+    const [outfits, setOutfits] = useState<Outfit[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [photos, setPhotos] = useState<Record<number, string>>({});
+    const [selectedLook, setSelectedLook] = useState<Outfit | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleSaveLook = (id: string) => {
-    setOutfits(outfits.map(outfit =>
-      outfit.id === id ? { ...outfit, saved: !outfit.saved } : outfit
-    ));
-  };
+    const keycloakId = localStorage.getItem('keycloakId');
+    const accessToken = localStorage.getItem('accessToken');
 
-  const savedCount = outfits.filter(o => o.saved).length;
+    useEffect(() => {
+        if (!keycloakId || !accessToken) {
+            setError('User not authenticated');
+            setLoading(false);
+            return;
+        }
 
-  return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
-            <Sparkles className="w-8 h-8 text-purple-600" />
-          </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            AI Outfit Suggestions
-          </h1>
-          <p className="text-lg text-gray-600 mb-4">
-            Personalized outfit combinations from your wardrobe
-          </p>
-          {savedCount > 0 && (
-            <button
-              onClick={() => navigate('/saved-looks')}
-              className="text-purple-600 font-medium hover:text-purple-700"
-            >
-              View {savedCount} saved {savedCount === 1 ? 'look' : 'looks'}
-            </button>
-          )}
-        </motion.div>
+        const fetchOutfits = async () => {
+            try {
+                const resLooks = await fetch(`http://localhost:80/api/looks/ai-suggestion/${keycloakId}`, {
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                });
+                if (!resLooks.ok) throw new Error('Failed to fetch AI suggestions');
+                const looksData = await resLooks.json();
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {outfits.map((outfit, index) => (
-            <motion.div
-              key={outfit.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
-            >
-              <div className="grid grid-cols-3 gap-1 p-4 bg-gray-50">
-                {outfit.items.map((item, idx) => (
-                  <div key={idx} className="aspect-square rounded-lg overflow-hidden">
-                    <img
-                      src={item}
-                      alt={`Item ${idx + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
+                const resPhotos = await fetch(`http://localhost:80/api/clothes/photos/${keycloakId}`, {
+                    headers: { Authorization: `Bearer ${accessToken}` },
+                });
+                if (!resPhotos.ok) throw new Error('Failed to fetch clothes images');
+                const photosData: Record<number, string> = await resPhotos.json();
+                setPhotos(photosData);
 
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-1">
-                      {outfit.name}
-                    </h3>
-                    <span className="inline-block px-3 py-1 bg-purple-100 text-purple-600 text-xs font-semibold rounded-full">
-                      {outfit.occasion}
-                    </span>
-                  </div>
-                  <button
-                    onClick={() => handleSaveLook(outfit.id)}
-                    className={`p-2 rounded-full transition-colors ${
-                      outfit.saved
-                        ? 'bg-red-100 text-red-600'
-                        : 'bg-gray-100 text-gray-400 hover:bg-red-50 hover:text-red-600'
-                    }`}
-                  >
-                    <Heart className={`w-5 h-5 ${outfit.saved ? 'fill-current' : ''}`} />
-                  </button>
+                const mapped: Outfit[] = looksData.map((look: any) => ({
+                    id: look.id.toString(),
+                    name: look.name,
+                    items: look.lookItems
+                        .map((li: any) => {
+                            const itemId = li.clothesDto.id;
+                            const base64 = photosData[itemId];
+                            return base64 ? `data:image/jpeg;base64,${base64}` : '';
+                        })
+                        .filter(Boolean),
+                    lookItems: look.lookItems,
+                    suggestedDate: look.createdAt,
+                    saved: false,
+                }));
+
+                setOutfits(mapped);
+                setLoading(false);
+            } catch (err: any) {
+                console.error(err);
+                setError(err.message || 'Something went wrong');
+                setLoading(false);
+            }
+        };
+
+        fetchOutfits();
+    }, [keycloakId, accessToken]);
+
+    const handleSaveLook = async (id: string) => {
+        const outfitIndex = outfits.findIndex((o) => o.id === id);
+        if (outfitIndex === -1) return;
+
+        const updatedOutfits = [...outfits];
+        updatedOutfits[outfitIndex].saving = true;
+        setOutfits(updatedOutfits);
+
+        try {
+            const res = await fetch(`http://localhost:80/api/looks/save-look/${id}`, {
+                method: 'POST',
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+            if (!res.ok) throw new Error('Failed to save look');
+
+            updatedOutfits[outfitIndex].saved = true;
+        } catch (err) {
+            console.error(err);
+        } finally {
+            updatedOutfits[outfitIndex].saving = false;
+            setOutfits([...updatedOutfits]);
+        }
+    };
+
+    const openLookModal = (look: Outfit) => {
+        setSelectedLook(look);
+        setIsModalOpen(true);
+    };
+
+    const savedCount = outfits.filter((o) => o.saved).length;
+
+    if (loading) return <div className="text-center py-12">Loading AI suggestions...</div>;
+    if (error) return <div className="text-center py-12 text-red-600">{error}</div>;
+
+    return (
+        <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-center mb-12"
+                >
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
+                        <Sparkles className="w-8 h-8 text-purple-600" />
+                    </div>
+                    <h1 className="text-4xl font-bold text-gray-900 mb-4">AI Outfit Suggestions</h1>
+                    <p className="text-lg text-gray-600 mb-4">
+                        Personalized outfit combinations from your wardrobe
+                    </p>
+                    {savedCount > 0 && (
+                        <button
+                            onClick={() => navigate('/saved-looks')}
+                            className="text-purple-600 font-medium hover:text-purple-700"
+                        >
+                            View {savedCount} saved {savedCount === 1 ? 'look' : 'looks'}
+                        </button>
+                    )}
+                </motion.div>
+
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {outfits.map((outfit, index) => (
+                        <motion.div
+                            key={outfit.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4, delay: index * 0.1 }}
+                            className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+                            onClick={() => openLookModal(outfit)}
+                        >
+                            <div className="grid grid-cols-3 gap-1 p-4 bg-gray-50">
+                                {outfit.items.map((item, idx) => (
+                                    <div key={idx} className="aspect-square rounded-lg overflow-hidden">
+                                        <img
+                                            src={item}
+                                            alt={`Item ${idx + 1}`}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="p-6">
+                                <div className="flex items-center justify-between mb-3">
+                                    <div className="mb-4">
+                                        <h3 className="text-xl font-bold text-gray-900 mb-2">
+                                            {outfit.name}
+                                        </h3>
+                                        <span className="text-xs text-gray-500">
+                                        Suggested date: {new Date(outfit.suggestedDate).toLocaleDateString()}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <button
+                                    disabled={outfit.saving || outfit.saved}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleSaveLook(outfit.id);
+                                    }}
+                                    className={`w-full px-4 py-2 rounded-full font-medium transition-colors ${
+                                        outfit.saved
+                                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            : 'bg-purple-600 text-white hover:bg-purple-700'
+                                    }`}
+                                >
+                                    {outfit.saving ? 'Saving...' : outfit.saved ? 'Saved' : 'Save Look'}
+                                </button>
+                            </div>
+                        </motion.div>
+                    ))}
                 </div>
+            </div>
 
-                <div className="flex gap-3 mt-4">
-                  <button
-                    onClick={() => handleSaveLook(outfit.id)}
-                    className={`flex-1 px-4 py-2 rounded-full font-medium transition-colors ${
-                      outfit.saved
-                        ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        : 'bg-purple-600 text-white hover:bg-purple-700'
-                    }`}
-                  >
-                    {outfit.saved ? 'Saved' : 'Save Look'}
-                  </button>
-                  <button className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-full font-medium hover:bg-gray-200 transition-colors flex items-center justify-center">
-                    <ShoppingBag className="w-4 h-4 mr-2" />
-                    Shop
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+            {/* Modal */}
+            <AnimatePresence>
+                {isModalOpen && selectedLook && (
+                    <motion.div
+                        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onClick={() => setIsModalOpen(false)}
+                    >
+                        <motion.div
+                            className="bg-white rounded-2xl p-8 w-full max-w-4xl relative mx-4"
+                            initial={{ scale: 0.9 }}
+                            animate={{ scale: 1 }}
+                            exit={{ scale: 0.9 }}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <button
+                                className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
+                                onClick={() => setIsModalOpen(false)}
+                            >
+                                <X className="w-6 h-6" />
+                            </button>
 
-        <div className="mt-12 text-center">
-          <button className="px-8 py-3 bg-white text-purple-600 font-semibold rounded-full hover:bg-gray-50 transition-colors border-2 border-purple-600">
-            Generate More Outfits
-          </button>
+                            <h2 className="text-2xl font-bold mb-6 text-center">{selectedLook.name}</h2>
+
+                            {/* Горизонтальная прокрутка */}
+                            <div className="flex overflow-x-auto gap-6 py-4 px-2 sm:px-4 md:px-6 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                                {selectedLook.lookItems?.map((li) => {
+                                    const img = photos[li.clothesDto.id];
+                                    return (
+                                        <div
+                                            key={li.clothesDto.id}
+                                            className="flex-shrink-0 flex flex-col items-center min-w-[160px] text-center"
+                                        >
+                                            {img && (
+                                                <img
+                                                    src={`data:image/jpeg;base64,${img}`}
+                                                    alt={li.clothesDto.itemName}
+                                                    className="w-36 h-36 object-cover rounded-xl shadow-md mb-2"
+                                                />
+                                            )}
+                                            <p className="text-sm font-semibold text-gray-800">
+                                                {li.clothesDto.itemName}
+                                            </p>
+                                            <p className="text-xs text-gray-500">{li.clothesDto.category}</p>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
-      </div>
-    </div>
-  );
+    );
 }
