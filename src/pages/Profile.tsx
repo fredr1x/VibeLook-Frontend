@@ -4,6 +4,17 @@ import { User, Mail, Heart, Shirt } from 'lucide-react';
 import {jwtDecode} from 'jwt-decode';
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+// -------------------- Вспомогательная функция для fetch --------------------
+const fetchWithNgrokBypass = async (url: string, options: RequestInit = {}) => {
+    const headers = {
+        ...options.headers,
+        'ngrok-skip-browser-warning': 'true',
+    };
+
+    return fetch(url, { ...options, headers });
+};
+
 interface UserPreferences {
     colorPreferences: string[];
     stylePreferences: string[];
@@ -79,8 +90,10 @@ export default function Profile() {
 
             try {
                 // --- 1. Загружаем профиль ---
-                const response = await fetch(`${API_URL}/api/profile/${userId}`, {
-                    headers: { Authorization: `Bearer ${token}` },
+                const response = await fetchWithNgrokBypass(`${API_URL}/api/profile/${userId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 });
 
                 if (!response.ok) throw new Error('Failed to load profile');
@@ -96,10 +109,12 @@ export default function Profile() {
 
                 // --- 2. Загружаем фото профиля как BLOB ---
                 try {
-                    const photoResponse = await fetch(
+                    const photoResponse = await fetchWithNgrokBypass(
                         `${API_URL}/api/files/get-profile/${data.keycloakId}`,
                         {
-                            headers: { Authorization: `Bearer ${token}` },
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                            },
                         }
                     );
 
@@ -134,7 +149,7 @@ export default function Profile() {
         const token = localStorage.getItem('accessToken');
 
         try {
-            const response = await fetch(`${API_URL}/api/profile/update`, {
+            const response = await fetchWithNgrokBypass(`${API_URL}/api/profile/update`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -186,9 +201,11 @@ export default function Profile() {
         formData.append('file', selectedFile);
 
         try {
-            const response = await fetch(`${API_URL}/api/files/profile/${userId}`, {
+            const response = await fetchWithNgrokBypass(`${API_URL}/api/files/profile/${userId}`, {
                 method: 'POST',
-                headers: { Authorization: `Bearer ${token}` },
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
                 body: formData,
             });
 
@@ -202,7 +219,7 @@ export default function Profile() {
             console.error(err);
         }
     };
-
+    
     if (isLoading) return <div className="flex justify-center items-center h-screen text-gray-500">Loading...</div>;
     if (!profile) return <div className="flex justify-center items-center h-screen text-red-500">Profile not found</div>;
 

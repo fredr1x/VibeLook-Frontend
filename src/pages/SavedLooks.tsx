@@ -3,6 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Trash2, Edit2, Heart, X } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+// -------------------- Вспомогательная функция для fetch --------------------
+const fetchWithNgrokBypass = async (url: string, options: RequestInit = {}) => {
+    const headers = {
+        ...options.headers,
+        'ngrok-skip-browser-warning': 'true',
+    };
+
+    return fetch(url, { ...options, headers });
+};
+
 type SavedOutfit = {
     id: string;
     name: string;
@@ -40,13 +51,13 @@ export default function SavedLooks() {
 
         const fetchSavedLooks = async () => {
             try {
-                const resLooks = await fetch(`${API_URL}/api/looks/saved-looks/${keycloakId}`, {
+                const resLooks = await fetchWithNgrokBypass(`${API_URL}/api/looks/saved-looks/${keycloakId}`, {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 });
                 if (!resLooks.ok) throw new Error('Failed to fetch saved looks');
                 const looksData = await resLooks.json();
 
-                const resPhotos = await fetch(`${API_URL}/api/clothes/photos/${keycloakId}`, {
+                const resPhotos = await fetchWithNgrokBypass(`${API_URL}/api/clothes/photos/${keycloakId}`, {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 });
                 if (!resPhotos.ok) throw new Error('Failed to fetch clothes images');
@@ -79,8 +90,20 @@ export default function SavedLooks() {
         fetchSavedLooks();
     }, [keycloakId, accessToken]);
 
-    const handleDelete = (id: string) => {
-        setSavedOutfits(savedOutfits.filter((outfit) => outfit.id !== id));
+    const handleDelete = async (id: string) => {
+        try {
+            const response = await fetchWithNgrokBypass(`${API_URL}/api/looks/${id}`, {
+                method: 'DELETE',
+                headers: { Authorization: `Bearer ${accessToken}` },
+            });
+
+            if (!response.ok) throw new Error('Failed to delete look');
+
+            setSavedOutfits(savedOutfits.filter((outfit) => outfit.id !== id));
+        } catch (err) {
+            console.error('Error deleting look:', err);
+            setError('Failed to delete look');
+        }
     };
 
     const handleEditStart = (outfit: SavedOutfit) => {
@@ -88,14 +111,30 @@ export default function SavedLooks() {
         setEditName(outfit.name);
     };
 
-    const handleEditSave = (id: string) => {
-        setSavedOutfits(
-            savedOutfits.map((outfit) =>
-                outfit.id === id ? { ...outfit, name: editName } : outfit
-            )
-        );
-        setEditingId(null);
-        setEditName('');
+    const handleEditSave = async (id: string) => {
+        try {
+            const response = await fetchWithNgrokBypass(`${API_URL}/api/looks/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({ name: editName }),
+            });
+
+            if (!response.ok) throw new Error('Failed to update look name');
+
+            setSavedOutfits(
+                savedOutfits.map((outfit) =>
+                    outfit.id === id ? { ...outfit, name: editName } : outfit
+                )
+            );
+            setEditingId(null);
+            setEditName('');
+        } catch (err) {
+            console.error('Error updating look:', err);
+            setError('Failed to update look name');
+        }
     };
 
     const openLookModal = (look: SavedOutfit) => {
@@ -168,16 +207,23 @@ export default function SavedLooks() {
                                                 value={editName}
                                                 onChange={(e) => setEditName(e.target.value)}
                                                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"
+                                                onClick={(e) => e.stopPropagation()}
                                             />
                                             <div className="flex gap-2 mt-2">
                                                 <button
-                                                    onClick={() => handleEditSave(outfit.id)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleEditSave(outfit.id);
+                                                    }}
                                                     className="flex-1 px-3 py-1 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700"
                                                 >
                                                     Save
                                                 </button>
                                                 <button
-                                                    onClick={() => setEditingId(null)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setEditingId(null);
+                                                    }}
                                                     className="flex-1 px-3 py-1 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300"
                                                 >
                                                     Cancel
@@ -190,8 +236,8 @@ export default function SavedLooks() {
                                                 {outfit.name}
                                             </h3>
                                             <span className="text-xs text-gray-500">
-                        Saved {new Date(outfit.savedDate).toLocaleDateString()}
-                      </span>
+                                                Saved {new Date(outfit.savedDate).toLocaleDateString()}
+                                            </span>
                                         </div>
                                     )}
 
@@ -268,7 +314,6 @@ export default function SavedLooks() {
                                             <p className="text-sm font-semibold text-gray-800">
                                                 {li.clothesDto.itemName}
                                             </p>
-
                                         </div>
                                     );
                                 })}

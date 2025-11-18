@@ -4,6 +4,16 @@ import { Heart, Sparkles, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+// -------------------- Вспомогательная функция для fetch с ngrok bypass --------------------
+const fetchWithNgrokBypass = async (url: string, options: RequestInit = {}) => {
+    const headers = {
+        ...options.headers,
+        'ngrok-skip-browser-warning': 'true',
+    };
+    return fetch(url, { ...options, headers });
+};
+
 type Outfit = {
     id: string;
     name: string;
@@ -41,13 +51,13 @@ export default function AISuggestions() {
 
         const fetchOutfits = async () => {
             try {
-                const resLooks = await fetch(`${API_URL}/api/looks/ai-suggestion/${keycloakId}`, {
+                const resLooks = await fetchWithNgrokBypass(`${API_URL}/api/looks/ai-suggestion/${keycloakId}`, {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 });
                 if (!resLooks.ok) throw new Error('Failed to fetch AI suggestions');
                 const looksData = await resLooks.json();
 
-                const resPhotos = await fetch(`${API_URL}/api/clothes/photos/${keycloakId}`, {
+                const resPhotos = await fetchWithNgrokBypass(`${API_URL}/api/clothes/photos/${keycloakId}`, {
                     headers: { Authorization: `Bearer ${accessToken}` },
                 });
                 if (!resPhotos.ok) throw new Error('Failed to fetch clothes images');
@@ -90,7 +100,7 @@ export default function AISuggestions() {
         setOutfits(updatedOutfits);
 
         try {
-            const res = await fetch(`${API_URL}/api/looks/save-look/${id}`, {
+            const res = await fetchWithNgrokBypass(`${API_URL}/api/looks/save-look/${id}`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${accessToken}` },
             });

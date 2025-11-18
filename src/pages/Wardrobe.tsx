@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
+
 type ClothingItem = {
     id: string;
     image: string;
@@ -119,9 +120,13 @@ export default function Wardrobe() {
     const keycloakId = localStorage.getItem('keycloakId');
     const accessToken = localStorage.getItem('accessToken');
 
+    // -------------------- Axios instance с ngrok bypass --------------------
     const api = axios.create({
         baseURL: `${API_URL}/api`,
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'ngrok-skip-browser-warning': 'true', // ✅ Добавлен заголовок
+        },
     });
 
     const categories: string[] = ['All', 'Shirts', 'Outwear', 'Pants', 'Shoes', 'Accessories'];
@@ -216,7 +221,10 @@ export default function Wardrobe() {
 
         try {
             const res = await api.post(`/clothes/add/${keycloakId}`, form, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'ngrok-skip-browser-warning': 'true', // ✅ Для multipart тоже
+                },
             });
 
             const added = res.data;
@@ -248,6 +256,17 @@ export default function Wardrobe() {
         } catch (err) {
             console.error('Upload failed:', err);
             alert('Failed to upload item.');
+        }
+    };
+
+    /** Удаление вещи */
+    const handleDeleteItem = async (itemId: string) => {
+        try {
+            await api.delete(`/clothes/${itemId}`);
+            setItems(items.filter((i) => i.id !== itemId));
+        } catch (err) {
+            console.error('Failed to delete item:', err);
+            alert('Failed to delete item.');
         }
     };
 
@@ -330,7 +349,7 @@ export default function Wardrobe() {
                                         className="bg-white rounded-xl shadow-md overflow-hidden group relative hover:shadow-xl transition-shadow"
                                     >
                                         <button
-                                            onClick={() => setItems(items.filter((i) => i.id !== item.id))}
+                                            onClick={() => handleDeleteItem(item.id)}
                                             className="absolute top-2 right-2 bg-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10 hover:bg-red-50"
                                         >
                                             <X className="w-4 h-4 text-red-600" />
