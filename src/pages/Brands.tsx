@@ -12,64 +12,64 @@ type Brand = {
 };
 
 export default function Brands() {
-  const brands: Brand[] = [
-    {
-      id: '1',
-      name: 'Zara',
-      logo: '/public/resources/brands/zara.png',
-      description: 'Contemporary fashion with European flair',
-      rating: 4.5,
-      category: 'Fast Fashion',
-      url: 'https://www.zara.com/kz/en/'
-    },
-    {
-      id: '2',
-      name: 'Nike',
-      logo: '/public/resources/brands/nike.png',
-      description: 'Athletic wear and streetwear essentials',
-      rating: 4.8,
-      category: 'Sportswear',
-      url: 'https://www.nike.com/'
-    },
-    {
-      id: '3',
-      name: 'Uniqlo',
-      logo: '/public/resources/brands/uniqlo.png',
-      description: 'Quality basics and innovative fabrics',
-      rating: 4.6,
-      category: 'Basics',
-      url: 'https://www.uniqlo.com/us/en/'
-    },
-    {
-      id: '4',
-      name: 'Adidas',
-      logo: '/public/resources/brands/adidas.png',
-      description: 'Sporty classics and modern streetwear',
-      rating: 4.7,
-      category: 'Sportswear',
-      url: 'https://adidas.kz/ru'
-    },
-    {
-      id: '5',
-      name: 'Patagonia',
-      logo: '/public/resources/brands/patagonia.png',
-      description: 'American casual wear for everyone',
-      rating: 4.2,
-      category: 'Casual',
-      url: 'https://www.patagonia.com/home/'
-    },
-    {
-      id: '6',
-      name: 'Levi\'s',
-      logo: '/public/resources/brands/levis.png',
-      description: 'Iconic denim and timeless styles',
-      rating: 4.7,
-      category: 'Denim',
-      url: 'https://www.levi.com/US/en_US/'
-    }
-  ];
+    const brands: Brand[] = [
+        {
+            id: '1',
+            name: 'Zara',
+            logo: '/resources/brands/zara.png',
+            description: 'Contemporary fashion with European flair',
+            rating: 4.5,
+            category: 'Fast Fashion',
+            url: 'https://www.zara.com/kz/en/'
+        },
+        {
+            id: '2',
+            name: 'Nike',
+            logo: '/resources/brands/nike.png',
+            description: 'Athletic wear and streetwear essentials',
+            rating: 4.8,
+            category: 'Sportswear',
+            url: 'https://www.nike.com/'
+        },
+        {
+            id: '3',
+            name: 'Uniqlo',
+            logo: '/resources/brands/uniqlo.png',
+            description: 'Quality basics and innovative fabrics',
+            rating: 4.6,
+            category: 'Basics',
+            url: 'https://www.uniqlo.com/us/en/'
+        },
+        {
+            id: '4',
+            name: 'Adidas',
+            logo: '/resources/brands/adidas.png',
+            description: 'Sporty classics and modern streetwear',
+            rating: 4.7,
+            category: 'Sportswear',
+            url: 'https://adidas.kz/ru'
+        },
+        {
+            id: '5',
+            name: 'Patagonia',
+            logo: '/resources/brands/patagonia.png',
+            description: 'American casual wear for everyone',
+            rating: 4.2,
+            category: 'Casual',
+            url: 'https://www.patagonia.com/home/'
+        },
+        {
+            id: '6',
+            name: 'Levi\'s',
+            logo: '/resources/brands/levis.png',
+            description: 'Iconic denim and timeless styles',
+            rating: 4.7,
+            category: 'Denim',
+            url: 'https://www.levi.com/US/en_US/'
+        }
+    ];
 
-  return (
+    return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         <motion.div

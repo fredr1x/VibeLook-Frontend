@@ -26,51 +26,51 @@ const ClothingTemplate = ({ type, subtype }: { type: string; subtype: string; co
     const getTemplatePath = (type: string, subtype: string): string => {
         const templates: Record<string, Record<string, string>> = {
             'SHIRTS': {
-                'T_SHIRT': '/public/resources/shirts/tshirt.png',
-                'SHIRT': '/public/resources/shirts/shirt.png',
-                'POLO': '/public/resources/shirts/polo.png',
-                'LONG_SLEEVE': '/public/resources/shirts/longsleeve.png',
-                'HOODIE': '/public/resources/shirts/hoodie.png',
-                'SWEATSHIRT': '/public/resources/shirts/sweatshirt.png',
-                'TANK_TOP': '/public/resources/shirts/tanktop.png',
+                'T_SHIRT': '/resources/shirts/tshirt.png',
+                'SHIRT': '/resources/shirts/shirt.png',
+                'POLO': '/resources/shirts/polo.png',
+                'LONG_SLEEVE': '/resources/shirts/longsleeve.png',
+                'HOODIE': '/resources/shirts/hoodie.png',
+                'SWEATSHIRT': '/resources/shirts/sweatshirt.png',
+                'TANK_TOP': '/resources/shirts/tanktop.png',
             },
             'PANTS': {
-                'JEANS': '/public/resources/pants/jeans.png',
-                'CHINOS': '/public/resources/pants/chinos.png',
-                'SHORTS': '/public/resources/pants/shorts.png',
-                'JOGGERS': '/public/resources/pants/joggers.png',
+                'JEANS': '/resources/pants/jeans.png',
+                'CHINOS': '/resources/pants/chinos.png',
+                'SHORTS': '/resources/pants/shorts.png',
+                'JOGGERS': '/resources/pants/joggers.png',
                 'SUIT_PANTS': '/resources/pants/suitpants.png',
-                'CARGO': '/public/resources/pants/cargo.png',
+                'CARGO': '/resources/pants/cargo.png',
             },
             'OUTWEAR': {
-                'JACKET': '/public/resources/outwears/jacket.png',
-                'COAT': '/public/resources/outwears/coat.png',
-                'WINDBREAKER': '/public/resources/outwears/windbreaker.png',
-                'ZIPPER_JACKET': '/public/resources/outwears/zipperjacket.png',
-                'SUIT_JACKET': '/public/resources/outwears/suitjacket.png',
-                'DOWN_JACKET': '/public/resources/outwears/downjacket.png',
-                'VEST': '/public/resources/outwears/vest.png'
+                'JACKET': '/resources/outwears/jacket.png',
+                'COAT': '/resources/outwears/coat.png',
+                'WINDBREAKER': '/resources/outwears/windbreaker.png',
+                'ZIPPER_JACKET': '/resources/outwears/zipperjacket.png',
+                'SUIT_JACKET': '/resources/outwears/suitjacket.png',
+                'DOWN_JACKET': '/resources/outwears/downjacket.png',
+                'VEST': '/resources/outwears/vest.png'
             },
             'SHOES': {
-                'SNEAKERS': '/public/resources/shoes/sneakers.png',
-                'BOOTS': '/public/resources/shoes/boots.png',
-                'SANDALS': '/public/resources/shoes/sandals.png',
-                'LOAFERS': '/public/resources/shoes/loafers.png',
-                'FORMAL_SHOES': '/public/resources/shoes/formalshoes.png',
-                'HEELS': '/public/resources/shoes/heels.png',
-                'SLIPPERS': '/public/resources/shoes/slippers.png',
-                'CROCS': '/public/resources/shoes/crocs.png',
+                'SNEAKERS': '/resources/shoes/sneakers.png',
+                'BOOTS': '/resources/shoes/boots.png',
+                'SANDALS': '/resources/shoes/sandals.png',
+                'LOAFERS': '/resources/shoes/loafers.png',
+                'FORMAL_SHOES': '/resources/shoes/formalshoes.png',
+                'HEELS': '/resources/shoes/heels.png',
+                'SLIPPERS': '/resources/shoes/slippers.png',
+                'CROCS': '/resources/shoes/crocs.png',
             },
             'ACCESSORIES': {
-                'CAP': '/public/resources/accessories/cap.png',
-                'BELT': '/public/resources/accessories/belt.png',
-                'WATCH': '/public/resources/accessories/watch.png',
-                'BEANIE': '/public/resources/accessories/beanie.png',
-                'HAT': '/public/resources/accessories/hat.png',
-                'SCARF': '/public/resources/accessories/scarf.png',
-                'TIE': '/public/resources/accessories/tie.png',
-                'SUNGLASSES': '/public/resources/accessories/sunglasses.png',
-                'BRACELET': '/public/resources/accessories/bracelet.png',
+                'CAP': '/resources/accessories/cap.png',
+                'BELT': '/resources/accessories/belt.png',
+                'WATCH': '/resources/accessories/watch.png',
+                'BEANIE': '/resources/accessories/beanie.png',
+                'HAT': '/resources/accessories/hat.png',
+                'SCARF': '/resources/accessories/scarf.png',
+                'TIE': '/resources/accessories/tie.png',
+                'SUNGLASSES': '/resources/accessories/sunglasses.png',
+                'BRACELET': '/resources/accessories/bracelet.png',
             },
         };
 
@@ -80,14 +80,14 @@ const ClothingTemplate = ({ type, subtype }: { type: string; subtype: string; co
         }
 
         const defaultTemplates: Record<string, string> = {
-            'Shirts': '/public/resources/shirts/shirt.png',
-            'Pants': '/public/resources/pants/chinos.png',
-            'Outwear': '/public/resources/outwears/downjacket.png',
-            'Shoes': '/public/resources/shoes/sneakers.png',
-            'Accessories': '/public/resources/accessories/watch.png',
+            'Shirts': '/resources/shirts/shirt.png',
+            'Pants': '/resources/pants/chinos.png',
+            'Outwear': '/resources/outwears/downjacket.png',
+            'Shoes': '/resources/shoes/sneakers.png',
+            'Accessories': '/resources/accessories/watch.png',
         };
 
-        return defaultTemplates[type] || '/public/resources/shirts/tshirt.png';
+        return defaultTemplates[type] || '/resources/shirts/tshirt.png';
     };
 
     const templatePath = getTemplatePath(type, subtype);
