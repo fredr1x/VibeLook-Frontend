@@ -16,7 +16,7 @@ export default function Brands() {
     {
       id: '1',
       name: 'Zara',
-      logo: '/resources/brands/zara.png',
+      logo: '/public/resources/brands/zara.png',
       description: 'Contemporary fashion with European flair',
       rating: 4.5,
       category: 'Fast Fashion',
@@ -25,7 +25,7 @@ export default function Brands() {
     {
       id: '2',
       name: 'Nike',
-      logo: '/resources/brands/nike.png',
+      logo: '/public/resources/brands/nike.png',
       description: 'Athletic wear and streetwear essentials',
       rating: 4.8,
       category: 'Sportswear',
@@ -34,7 +34,7 @@ export default function Brands() {
     {
       id: '3',
       name: 'Uniqlo',
-      logo: '/resources/brands/uniqlo.png',
+      logo: '/public/resources/brands/uniqlo.png',
       description: 'Quality basics and innovative fabrics',
       rating: 4.6,
       category: 'Basics',
@@ -43,7 +43,7 @@ export default function Brands() {
     {
       id: '4',
       name: 'Adidas',
-      logo: '/resources/brands/adidas.png',
+      logo: '/public/resources/brands/adidas.png',
       description: 'Sporty classics and modern streetwear',
       rating: 4.7,
       category: 'Sportswear',
@@ -52,7 +52,7 @@ export default function Brands() {
     {
       id: '5',
       name: 'Patagonia',
-      logo: '/resources/brands/patagonia.png',
+      logo: '/public/resources/brands/patagonia.png',
       description: 'American casual wear for everyone',
       rating: 4.2,
       category: 'Casual',
@@ -61,7 +61,7 @@ export default function Brands() {
     {
       id: '6',
       name: 'Levi\'s',
-      logo: '/resources/brands/levis.png',
+      logo: '/public/resources/brands/levis.png',
       description: 'Iconic denim and timeless styles',
       rating: 4.7,
       category: 'Denim',
@@ -117,7 +117,7 @@ export default function Brands() {
                     <span className="ml-1 text-sm font-semibold text-gray-700">
                       {brand.rating}
                     </span>
-                  </div>
+                  </div>/public
                 </div>
 
                 <p className="text-gray-600 text-sm mb-4">

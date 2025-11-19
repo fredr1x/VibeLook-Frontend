@@ -2,7 +2,8 @@ import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
 import { useState, ChangeEvent, FormEvent } from "react";
 import { login } from "../api/auth";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
+import { Eye, EyeOff } from "lucide-react";
 
 interface LoginForm {
     email: string;
@@ -12,6 +13,7 @@ interface LoginForm {
 export default function Login() {
     const navigate = useNavigate();
     const [form, setForm] = useState<LoginForm>({ email: "", password: "" });
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -21,8 +23,8 @@ export default function Login() {
         e.preventDefault();
         try {
             const res = await login(form);
-            const accessToken = res.data?.accessToken || res.data?.accessToken;
-            const refreshToken = res.data?.refreshToken || res.data?.refreshToken;
+            const accessToken = res.data?.accessToken;
+            const refreshToken = res.data?.refreshToken;
 
             if (accessToken && refreshToken) {
                 localStorage.setItem("accessToken", accessToken);
@@ -55,6 +57,7 @@ export default function Login() {
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-5">
+                    {/* Email */}
                     <div>
                         <label className="block text-gray-700 font-medium mb-2">Email</label>
                         <input
@@ -67,16 +70,28 @@ export default function Login() {
                         />
                     </div>
 
+                    {/* Password с глазиком */}
                     <div>
                         <label className="block text-gray-700 font-medium mb-2">Password</label>
-                        <input
-                            name="password"
-                            value={form.password}
-                            onChange={handleChange}
-                            type="password"
-                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
-                            required
-                        />
+                        <div className="relative w-full">
+                            <input
+                                name="password"
+                                value={form.password}
+                                onChange={handleChange}
+                                type={showPassword ? "text" : "password"}
+                                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 pr-12"
+                                required
+                            />
+                            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="text-gray-400 hover:text-gray-700"
+                                >
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <button
