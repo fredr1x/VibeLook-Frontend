@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { User, Mail, Heart, Shirt } from 'lucide-react';
+import { User, Mail, Heart, Shirt, Plus, X } from 'lucide-react';
 import {jwtDecode} from 'jwt-decode';
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -41,6 +41,31 @@ interface DecodedToken {
     exp?: number;
 }
 
+// -------------------- Доступные стили и цвета --------------------
+const AVAILABLE_STYLES = [
+    'CASUAL',
+    'FORMAL',
+    'SPORTY',
+    'STREET_WEAR',
+    'ELEGANT',
+    'BUSINESS',
+    'BOHEMIAN',
+    'VINTAGE',
+    'MINIMALIST',
+    'PREPPY'
+];
+
+const AVAILABLE_COLORS = [
+    'WHITE', 'BLACK', 'GRAY', 'BROWN', 'BEIGE', 'CREAM',
+    'RED', 'MAROON', 'PINK', 'ORANGE', 'CORAL', 'BURGUNDY',
+    'BLUE', 'NAVY', 'SKY_BLUE', 'TURQUOISE', 'CYAN', 'TEAL',
+    'GREEN', 'OLIVE', 'KHAKI', 'MINT',
+    'PURPLE', 'LILAC', 'VIOLET',
+    'YELLOW', 'GOLD', 'MUSTARD',
+    'SILVER', 'CHARCOAL',
+    'IVORY', 'DENIM', 'CAMEL'
+];
+
 function getUserIdFromToken(): string | null {
     const token = localStorage.getItem('accessToken');
     if (!token) return null;
@@ -73,6 +98,9 @@ export default function Profile() {
     const [editedEmail, setEditedEmail] = useState('');
     const [editedColors, setEditedColors] = useState<string[]>([]);
     const [editedStyles, setEditedStyles] = useState<string[]>([]);
+
+    const [showStyleModal, setShowStyleModal] = useState(false);
+    const [showColorModal, setShowColorModal] = useState(false);
 
     const [profilePhoto, setProfilePhoto] = useState<string>('https://via.placeholder.com/150?text=Avatar');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -219,7 +247,33 @@ export default function Profile() {
             console.error(err);
         }
     };
-    
+
+    // -------------------- Управление стилями и цветами --------------------
+    const addStyle = (style: string) => {
+        if (!editedStyles.includes(style)) {
+            setEditedStyles([...editedStyles, style]);
+        }
+        setShowStyleModal(false);
+    };
+
+    const removeStyle = (style: string) => {
+        setEditedStyles(editedStyles.filter(s => s !== style));
+    };
+
+    const addColor = (color: string) => {
+        if (!editedColors.includes(color)) {
+            setEditedColors([...editedColors, color]);
+        }
+        setShowColorModal(false);
+    };
+
+    const removeColor = (color: string) => {
+        setEditedColors(editedColors.filter(c => c !== color));
+    };
+
+    const availableStylesToAdd = AVAILABLE_STYLES.filter(s => !editedStyles.includes(s));
+    const availableColorsToAdd = AVAILABLE_COLORS.filter(c => !editedColors.includes(c));
+
     if (isLoading) return <div className="flex justify-center items-center h-screen text-gray-500">Loading...</div>;
     if (!profile) return <div className="flex justify-center items-center h-screen text-red-500">Profile not found</div>;
 
@@ -323,6 +377,8 @@ export default function Profile() {
                                                     setEditedFirstname(profile.firstname);
                                                     setEditedLastname(profile.lastname);
                                                     setEditedEmail(profile.email);
+                                                    setEditedColors(profile.userPreferences?.colorPreferences || []);
+                                                    setEditedStyles(profile.userPreferences?.stylePreferences || []);
                                                     setProfilePhoto(profile.photoUrl || 'resources/avatar-placeholder.png');
                                                 }
                                             }}
@@ -364,31 +420,79 @@ export default function Profile() {
                             <div>
                                 <h2 className="text-xl font-bold text-gray-900 mb-4">Style Preferences</h2>
 
+                                {/* Favorite Styles */}
                                 <div className="mb-6">
-                                    <h3 className="text-sm font-semibold text-gray-700 mb-3">Favorite Styles</h3>
-                                    <div className="flex flex-wrap gap-2">
-                                        {editedStyles.map(style => (
-                                            <span
-                                                key={style}
-                                                className="px-4 py-2 bg-purple-100 text-purple-600 rounded-full text-sm font-medium"
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h3 className="text-sm font-semibold text-gray-700">Favorite Styles</h3>
+                                        {isEditing && (
+                                            <button
+                                                onClick={() => setShowStyleModal(true)}
+                                                className="flex items-center gap-1 px-3 py-1 bg-purple-600 text-white rounded-full text-sm hover:bg-purple-700 transition-colors"
                                             >
-                                                {formatEnum(style)}
-                                            </span>
-                                        ))}
+                                                <Plus className="w-4 h-4" />
+                                                Add
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {editedStyles.length === 0 ? (
+                                            <p className="text-gray-400 text-sm">No styles selected</p>
+                                        ) : (
+                                            editedStyles.map(style => (
+                                                <span
+                                                    key={style}
+                                                    className="group relative px-4 py-2 bg-purple-100 text-purple-600 rounded-full text-sm font-medium"
+                                                >
+                                                    {formatEnum(style)}
+                                                    {isEditing && (
+                                                        <button
+                                                            onClick={() => removeStyle(style)}
+                                                            className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        >
+                                                            <X className="w-3 h-3" />
+                                                        </button>
+                                                    )}
+                                                </span>
+                                            ))
+                                        )}
                                     </div>
                                 </div>
 
+                                {/* Favorite Colors */}
                                 <div>
-                                    <h3 className="text-sm font-semibold text-gray-700 mb-3">Favorite Colors</h3>
-                                    <div className="flex flex-wrap gap-2">
-                                        {editedColors.map(color => (
-                                            <span
-                                                key={color}
-                                                className="px-4 py-2 bg-purple-100 text-purple-600 rounded-full text-sm font-medium"
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h3 className="text-sm font-semibold text-gray-700">Favorite Colors</h3>
+                                        {isEditing && (
+                                            <button
+                                                onClick={() => setShowColorModal(true)}
+                                                className="flex items-center gap-1 px-3 py-1 bg-purple-600 text-white rounded-full text-sm hover:bg-purple-700 transition-colors"
                                             >
-                                                {formatEnum(color)}
-                                            </span>
-                                        ))}
+                                                <Plus className="w-4 h-4" />
+                                                Add
+                                            </button>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                        {editedColors.length === 0 ? (
+                                            <p className="text-gray-400 text-sm">No colors selected</p>
+                                        ) : (
+                                            editedColors.map(color => (
+                                                <span
+                                                    key={color}
+                                                    className="group relative px-4 py-2 bg-purple-100 text-purple-600 rounded-full text-sm font-medium"
+                                                >
+                                                    {formatEnum(color)}
+                                                    {isEditing && (
+                                                        <button
+                                                            onClick={() => removeColor(color)}
+                                                            className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        >
+                                                            <X className="w-3 h-3" />
+                                                        </button>
+                                                    )}
+                                                </span>
+                                            ))
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -396,6 +500,64 @@ export default function Profile() {
                     </div>
                 </motion.div>
             </div>
+
+            {/* Style Modal */}
+            {showStyleModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowStyleModal(false)}>
+                    <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-xl font-bold text-gray-900">Add Style</h3>
+                            <button onClick={() => setShowStyleModal(false)} className="text-gray-500 hover:text-gray-700">
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <div className="space-y-2">
+                            {availableStylesToAdd.length === 0 ? (
+                                <p className="text-gray-400 text-center py-4">All styles already added</p>
+                            ) : (
+                                availableStylesToAdd.map(style => (
+                                    <button
+                                        key={style}
+                                        onClick={() => addStyle(style)}
+                                        className="w-full text-left px-4 py-3 rounded-lg hover:bg-purple-50 transition-colors border border-gray-200"
+                                    >
+                                        {formatEnum(style)}
+                                    </button>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Color Modal */}
+            {showColorModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onClick={() => setShowColorModal(false)}>
+                    <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="text-xl font-bold text-gray-900">Add Color</h3>
+                            <button onClick={() => setShowColorModal(false)} className="text-gray-500 hover:text-gray-700">
+                                <X className="w-6 h-6" />
+                            </button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                            {availableColorsToAdd.length === 0 ? (
+                                <p className="col-span-2 text-gray-400 text-center py-4">All colors already added</p>
+                            ) : (
+                                availableColorsToAdd.map(color => (
+                                    <button
+                                        key={color}
+                                        onClick={() => addColor(color)}
+                                        className="text-left px-4 py-3 rounded-lg hover:bg-purple-50 transition-colors border border-gray-200"
+                                    >
+                                        {formatEnum(color)}
+                                    </button>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

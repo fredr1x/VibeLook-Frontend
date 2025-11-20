@@ -262,7 +262,7 @@ export default function Wardrobe() {
     /** Удаление вещи */
     const handleDeleteItem = async (itemId: string) => {
         try {
-            await api.delete(`/clothes/${itemId}`);
+            await api.delete(`/clothes/delete/${itemId}`);
             setItems(items.filter((i) => i.id !== itemId));
         } catch (err) {
             console.error('Failed to delete item:', err);
